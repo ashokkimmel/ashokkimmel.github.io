@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+From:
+<select name="Start" id="Start">
+  <option value="Grams">Grams</option>
+  <option value="Moles">Moles</option>
+  <option value="Particles">Particles</option>
+</select>
+To:
+
+<select name="End" id="End">
+  <option value="Grams">Grams</option>
+  <option value="Moles">Moles</option>
+  <option value="Particles">Particles</option>
+</select>
+<input max="9" min="1" type="number" id = "avosigfigs" name = "avosigfigs" value="3">
+<br>
+Input: <input type="number" id="StartingValue" name="StartingValue">
+Exponent: <input type="number" id="Exponent" name="Exponent">
+Atomic Mass of Compound: <input type="number" id="Mass" name="Mass"><br>
+<!-- <input type="text" id="ParticleType" name="ParticleType"> <br> -->
+
+
+<output id="output" name="output"></output>
+
+<script type="text/javascript">
+const avonumber = 6.02214076 * Math.pow(10,23);
+
+function sigfigs(mystr) {
+  let dots = Math.min(mystr.indexOf('.')+ 1,1);
+  let negatives = Math.min(mystr.indexOf('-')+ 1,1);
+  let possibleend = mystr.length - dots - negatives;
+  return possibleend;
+}
+function setval(elementname,val) {document.getElementById(elementname).value = val;}
+function gval(elementname) {return document.getElementById(elementname).value;}
+
+function getexpt(x) {
+  if (x>10) {return getexpt(x/10) + 1;}
+  else{return 0;}
+}
+function stylewsigfigs(sf,num) {
+  let expt = getexpt(num);
+  let scientific = (num / Math.pow(10,expt)).toString();
+  if (sf == 1) {return scientific.substring(0,1)+"*10^"+expt;}
+  else {return scientific.substring(0,sf+1)+"*10^"+expt;}
+}
+function MoletoParticle(moles){return avonumber * moles;}
+function ParticletoMole(particles){return particles/avonumber;}
+function MoletoGram(moles){return moles * gval("Mass")}
+function GramtoMole(grams){return grams / gval("Mass")}
+function contains(mystr){return gval("Start")==mystr|| gval("End")==mystr;}
+
+function getsfs(){
+    let needavo = contains("Particles");
+    let needgrams = contains("Grams");
+    let sfsinput = sigfigs(gval('StartingValue'));
+    let sfsinputwavo = needavo ? Math.min(sfsinput,gval('avosigfigs')) : sfsinput;
+    let sfs = needgrams ? Math.min(sfsinputwavo,sigfigs(gval("Mass"))) : sfsinputwavo;
+    return sfs;
+}
+
+function setoutput(finalanswer){
+  setval('output',stylewsigfigs(getsfs(),finalanswer));
+}
+function getinput(){
+  return fullinput = gval('StartingValue') * Math.pow(10,gval('Exponent'));
+}
+function myfunction() {
+    if (contains("Grams")) {
+      if (gval("Mass")=="") {
+        setval("output","NO WEIGHT INPUTED");
+        return;
+      }
+    }
+    let fullinput = getinput();
+    if (gval("Start")==gval("End"))
+    {setoutput(fullinput)}
+    else if (gval("Start")=="Moles"&&gval("End")=="Particles"){
+      let answer = MoletoParticle(fullinput);
+      setoutput(answer);
+    }
+    else if (gval("Start")=="Particles"&&gval("End")=="Moles"){
+      let answer = ParticletoMole(fullinput);
+      setoutput(answer);
+    }
+    else if (gval("Start")=="Particles"&&gval("End")=="Grams"){
+      let moles=ParticletoMole(fullinput);x
+      let answer=MoletoGrams(moles);
+      setoutput(answer);
+    }
+
+    else if (gval("Start")=="Grams"&&gval("End")=="Particles"){
+      let moles = GramtoMole(fullinput);
+      let answer = MoletoParticle(moles);
+      setoutput(answer);
+    }
+    else if (gval("Start")=="Grams"&&gval("End")=="Moles"){
+      let answer = GramtoMole(fullinput);
+      setoutput(answer);
+    }
+    else if (gval("Start")=="Moles"&&gval("End")=="Grams"){
+      let answer = MoletoGram(fullinput);
+      setoutput(answer);
+    }
+}
+
+document.getElementById('StartingValue').addEventListener("change",myfunction);
+document.getElementById('StartingValue').addEventListener("keyup",myfunction);
+document.getElementById('Exponent').addEventListener("change",myfunction);
+document.getElementById('Exponent').addEventListener("keyup",myfunction);
+document.getElementById('Mass').addEventListener("change",myfunction);
+document.getElementById('Mass').addEventListener("keyup",myfunction);
+document.getElementById('Start').addEventListener("change",myfunction);
+document.getElementById('End').addEventListener("change",myfunction);
+
+</script>
+</body>
+</html>
+
